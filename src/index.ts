@@ -1,8 +1,9 @@
 import Server from './services/server';
 import Config from './config';
+import { Logger } from './services/logger';
 
 const port = Config.PORT;
 
-Server.listen(port, () => console.log(`Server up port: ${port}`))
+Server.listen(port, () => Logger.info(`Server up port: ${port}`))
 
 
