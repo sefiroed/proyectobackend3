@@ -1,0 +1,29 @@
+[
+	{
+		"_id": "1",
+		"name": "Terreno",
+		"description": "lugar",
+		"codeproduct": 5545,
+		"url": "http://mercadolibre.com",
+		"price": 200000,
+		"stock": 7
+	},
+	{
+		"_id": "2",
+		"name": "Finca",
+		"description": "Edificación",
+		"codeproduct": 5546,
+		"url": "http://mercadolibre.com",
+		"price": 250000,
+		"stock": 5
+	},
+	{
+		"_id": "3",
+		"name": "Urbanización",
+		"description": "Barrio",
+		"codeproduct": 5547,
+		"url": "http://mercadolibre.com",
+		"price": 300000,
+		"stock": 3
+	}
+]
