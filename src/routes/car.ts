@@ -5,16 +5,18 @@ import asyncHandler from 'express-async-handler';
 const router = Router();
 
 router.get(
-    '/:id?',carProductsController.checkProductCarExists, 
-    asyncHandler(carProductsController.getProductsCar)
+    '/',carProductsController.checkProductCarExists, 
+    asyncHandler(carProductsController.getCarByUser)
 );
 router.post(
-    '/', carProductsController.checkAddProductCar,
+    '/add', carProductsController.checkAddProductCar,
     asyncHandler(carProductsController.addProductsCar)
 );
-router.delete(
-    '/:id', carProductsController.checkProductCarExists,
-    asyncHandler(carProductsController.deleteProductsCar)
+router.post(
+    '/delete', carProductsController.checkProductCarExists,
+    asyncHandler(carProductsController.deleteProduct)
 );
+
+router.post('submit');
 
 export default router;

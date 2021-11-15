@@ -1,6 +1,6 @@
-import { NewUserI, UserI, UserQuery } from '../models/car/users/users.interface';
-import { UserFactoryDAO } from '../models/car/users/users.factory';
-import { TipoPersistencia } from '../models/car/users/users.factory';
+import { NewUserI, UserI, UserQuery } from '../models/users/users.interface';
+import { UserFactoryDAO } from '../models/users/users.factory';
+import { TipoPersistencia } from '../models/users/users.factory';
 import { productsCarAPI } from './productscar';
 /**
  * Con esta variable elegimos el tipo de persistencia
@@ -21,6 +21,7 @@ class User {
   }
 
   async addUser(productData: NewUserI): Promise<UserI> {
+    console.log("hola2");
     const newUser = await this.users.add(productData);
     await productsCarAPI.createCar(newUser._id);
     return newUser;
@@ -37,15 +38,19 @@ class User {
   }
 
   async query(username?: string, email?: string): Promise<UserI> {
-    const query = {
-      $or: [] as UserQuery[],
-    };
+    try{
+      const query = {
+        $or: [] as UserQuery[],
+      };
 
-    if (username) query.$or.push({ username });
+      if (username) query.$or.push({ username });
 
-    if (email) query.$or.push({ email });
+      if (email) query.$or.push({ email });
 
-    return this.users.query(query);
+      return this.users.query(query);
+    }catch(err){
+      throw err;
+    }  
   }
 
   async ValidatePassword(username: string, password: string) {

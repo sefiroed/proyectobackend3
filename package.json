@@ -1,5 +1,5 @@
 {
-  "name": "segundoentregableproyecto",
+  "name": "tercerentregableproyecto",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -46,6 +46,7 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
+    "express-session": "^1.17.2",
     "firebase-admin": "^9.11.1",
     "joi": "^17.4.2",
     "knex": "^0.95.11",

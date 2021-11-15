@@ -3,17 +3,16 @@ import {
   ProductCarI,
   ProductCar,
   ProductCarBaseClass,
-  ProductCarQuery,
 } from '../productscar.interface';
 import Config from '../../../config';
 
-const productsSchema = new mongoose.Schema<ProductCarI>({
+const productsCarSchema = new mongoose.Schema<ProductCarI>({
   userId: {
     type: Schema.Types.ObjectId,
     required: true,
     unique: true,
   },
-  products: [
+  productsCar: [
     {
       _id: Schema.Types.ObjectId,
       amount: Number,
@@ -26,31 +25,10 @@ export class ProductsCarAtlasDAO implements ProductCarBaseClass {
   private car;
 
   constructor(local: boolean = false) {
-    if (local)
-      this.srv = `mongodb://localhost:27017/${Config.MONGO_LOCAL_DBNAME}`;
-    else
-      this.srv = `mongodb+srv://${Config.MONGO_ATLAS_USER}:${Config.MONGO_ATLAS_PASSWORD}@${Config.MONGO_ATLAS_CLUSTER}/${Config.MONGO_ATLAS_DBNAME}?retryWrites=true&w=majority`;
-    mongoose.connect(this.srv);
-    this.car = mongoose.model<ProductCarI>('productcar', productsSchema);
-  }
-  async createCar(userId: string): Promise<ProductCarI> {
-    const newCar = new this.car({
-      userId,
-      products: [],
-    });
-    await newCar.save();
-
-    return newCar;
-  }
-
-  productExist(car: ProductCarI, productId: string): boolean {
-    const index = car.products.findIndex(
-      (data) => data._id == productId
-    );
-
-    if (index < 0) return false;
-
-    return true;
+    this.srv = `mongodb://localhost:27017/${Config.MONGO_LOCAL_DBNAME}`;
+    mongoose.connection.useDb(this.srv ? this.srv : Config.MONGO_ATLAS_SRV);
+    mongoose.connection.useDb(this.srv);
+    this.car = mongoose.model<ProductCarI>('productcar', productsCarSchema);
   }
 
   async get(userId: string): Promise<ProductCarI> {
@@ -60,56 +38,59 @@ export class ProductsCarAtlasDAO implements ProductCarBaseClass {
 
     return result;
   }
+  
+  async createCar(userId: string): Promise<ProductCarI> {
+    const newCar = new this.car({
+      userId,
+      productsCar: [],
+    });
+    await newCar.save();
+
+    return newCar;
+  }
+
+  productExist(car: ProductCarI, productId: string): boolean {
+    const index = car.productsCar.findIndex(
+      (data) => data._id == productId
+    );
+
+    if (index < 0) return false;
+
+    return true;
+  }
 
   async add(carId: string, product: ProductCar): Promise<ProductCarI> {
-    const cart = await this.car.findById(carId);
-    if (!cart) throw new Error('Cart not found');
+    const car = await this.car.findById(carId);
+    if (!car) throw new Error('Cart not found');
 
-    const index = cart.products.findIndex(
+    const index = car.productsCar.findIndex(
       (aProduct) => aProduct._id == product._id
     );
 
-    if (index < 0) cart.products.push(product);
-    else cart.products[index].amount += product.amount;
+    if (index < 0) car.productsCar.push(product);
+    else car.productsCar[index].amount += product.amount;
 
-    await cart.save();
+    await car.save();
 
-    return cart;
+    return car;
   }
 
   async delete(carId: string, product: ProductCar): Promise<ProductCarI> {
-    const cart = await this.car.findById(carId);
-    if (!cart) throw new Error('Cart not found');
+    const car = await this.car.findById(carId);
+    if (!car) throw new Error('Cart not found');
 
-    const index = cart.products.findIndex(
-      (aProduct) => aProduct._id == product._id
+    const index = car.productsCar.findIndex(
+      (data) => data._id == product._id
     );
 
     if (index < 0) throw new Error('Product not found');
 
-    if (cart.products[index].amount <= product.amount)
-      cart.products.splice(index, 1);
-    else cart.products[index].amount -= product.amount;
+    if (car.productsCar[index].amount <= product.amount)
+      car.productsCar.splice(index, 1);
+    else car.productsCar[index].amount -= product.amount;
 
-    await cart.save();
-    return cart;
+    await car.save();
+    return car;
   }
 
-  async query(options: ProductCarQuery): Promise<ProductCarI[]> {
-    let query: ProductCarQuery = {};
-
-    if (options.name) query.name = options.name;
-
-    if (options.description) query.description = options.description;
-
-    if (options.codeproduct) query.codeproduct = options.codeproduct;
-
-    if (options.url) query.url = options.url;
-
-    if (options.price) query.price = options.price;
-
-    if (options.stock) query.stock = options.stock;
-
-    return this.car.find(query);
-  }
 }

@@ -41,10 +41,8 @@ export class UsuariosAtlasDAO implements UserBaseClass {
   private users;
 
   constructor(local: boolean = false) {
-    if (local)
-      this.srv = `mongodb://localhost:27017/${Config.MONGO_LOCAL_DBNAME}`;
-    else this.srv = Config.MONGO_ATLAS_SRV;
-    mongoose.connect(this.srv);
+    this.srv = `mongodb://localhost:27017/${Config.MONGO_LOCAL_DBNAME}`;
+    mongoose.connection.useDb(this.srv ? this.srv : Config.MONGO_ATLAS_SRV);
     this.users = mongoose.model<UserI>('user', usersSchema);
   }
 
@@ -80,8 +78,14 @@ export class UsuariosAtlasDAO implements UserBaseClass {
   }
 
   async query(query: any): Promise<UserI> {
-    const result = await this.users.find(query);
-    return result[0];
+    console.log("hola4");
+    try{
+      const result = await this.users.find(query);
+      console.log(result);
+      return result[0];
+    }catch (err) {
+      throw err;
+    }  
   }
 
   async validateUserPassword(

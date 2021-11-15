@@ -12,7 +12,7 @@ import passport from '../middleware/admin';
 
 const StoreOptions = {
   store: MongoStore.create({
-    mongoUrl: Config.MONGO_ATLAS_SRV,
+    mongoUrl: `mongodb+srv://admin:3472180@cluster0.eubxi.mongodb.net/ecommerce?retryWrites=true&w=majority`,
   }),
 
   secret: Config.SESSION_SECRET,
@@ -25,12 +25,19 @@ const StoreOptions = {
 
 
 const app = express();
+app.use(session(StoreOptions));
 
-export const publicFolderPath = path.resolve(__dirname, '../../public');
-
+const publicFolderPath = path.resolve(__dirname, '../../public');
 app.use(express.static(publicFolderPath));
 
 app.use(express.json());
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use((req, res, next) => {
+  Logger.info(`REQ.USER ===> ${JSON.stringify(req.user)}`);
+  next();
+});
 app.use('/api', apiRouter)
 
 

@@ -34,7 +34,7 @@ export class NewFactoryDAO {
 
       case TypePersistence.LocalMongo:
         console.log('RETURN INSTANCE CLASS MONGO LOCAL');
-        return new ProductsAtlasDAO(true);
+        return new ProductsAtlasDAO();
 
       case TypePersistence.MYSQL:
         console.log('RETURN INSTANCE CLASS MSQL')

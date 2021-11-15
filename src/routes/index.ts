@@ -11,7 +11,7 @@ const router = Router();
 router.use('/auth', AuthRouter);
 router.use('/products', productsRouter);
 router.use('/car', isLoggedIn, carRouter);
-router.use('*', HandleError.genericError)
 router.use('/user', userRouter);
+router.use('*', HandleError.genericError)
 
 export default router;

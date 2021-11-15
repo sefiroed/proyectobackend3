@@ -6,7 +6,7 @@ import {
   IStrategyOptionsWithRequest,
 } from 'passport-local';
 import { UserAPI } from '../apis/users';
-import { userJoiSchema } from '../models/car/users/users.interface';
+import { userJoiSchema } from '../models/users/users.interface';
 import { Logger } from '../services/logger';
 
 
@@ -103,6 +103,7 @@ passport.deserializeUser(async (userId: string, done) => {
 });
 
 export const isLoggedIn = (req: Request, res: Response, done: NextFunction) => {
+  console.log(req);
   if (!req.user) return res.status(401).json({ msg: 'Unathorized' });
 
   done();

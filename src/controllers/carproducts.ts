@@ -1,6 +1,7 @@
 import {Request, Response, NextFunction} from 'express';
 import { productsCarAPI } from '../apis/productscar';
-import { ProductCarQuery } from '../models/car/productscar.interface';
+import { productsAPI } from '../apis/products';
+
 
 class CarProduct {
 
@@ -34,93 +35,61 @@ class CarProduct {
 
     next();
   }
-  
-  async getProductsCar (req : Request, res : Response) {
 
-    const { id } = req.params;
-    const { name, description, codeproduct, url, price, stock } = req.query;
-    // const product = productsPersistence.get(id);
-    if (id) {
-      const result = await productsCarAPI.getProducts(id);
-      if (!result.length)
-        return res.status(404).json({
-          data: 'OBJECT NOT FOUND',
-        });
-
-      return res.json({
-        data: result,
-      });
-    }
-
-    const query: ProductCarQuery = {};
-
-    if (name) query.name = name.toString();
-
-    if (description) query.description = description.toString();
-
-    if (codeproduct) query.codeproduct = Number(codeproduct);
-
-    if (url) query.url = url.toString();
-
-    if (price) query.price = Number(price);
-
-    if (stock) query.stock = Number(stock);
-
-    if (Object.keys(query).length) {
-      return res.json({
-        data: await productsCarAPI.query(query),
-      });
-    }
-
-    res.json({
-      data: await productsCarAPI.getProducts(),
-    });
-    // const id = Number(req.params.id);
-    // const product = carProductsPersistence.get(id);
-    // if(id){
-    //   console.log(product);
-    //   if(!product){
-    //     return res.status(404).json({
-    //       msg: "Product not found"
-    //     })
-    //   }else{   
-    //     res.json({product})
-    //   }     
-    //   return res.status(404).json({
-    //     msg: "ID invalidate"
-    //   })
-    // }
-    // if (product.length < 1) {
-    //   return res.status(400).json({
-    //     error: 'No products loaded',
-    //   });
-    // }
-    // res.json({
-    //   data: carProductsPersistence.get()
-    // })
-    
-  }
-  
-
-  async addProductsCar (req : Request, res : Response) {  
-
-    const body = req.body;
-    const product = await productsCarAPI.addProduct(body);
-
-    res.json({
-      msg: 'product added successfully',
-      data: product,
-    });
-      
+  async getCarByUser(req: Request, res: Response) {
+    const user: any = req.user;
+    const cart = await productsCarAPI.getProducts(user._id);
+    res.json(cart);
   }
 
-  async deleteProductsCar (req : Request, res : Response) {
-    const id = req.params.id;
+  async addProductsCar(req: Request, res: Response) {
+    const user: any = req.user;
+    const cart = await productsCarAPI.getProducts(user._id);
 
-    await productsCarAPI.deleteProduct(id);
-    res.json({
-      msg: "Product deleted",
-    })
+    const { productId, productAmount } = req.body;
+
+    if (!productId || !productAmount)
+      return res.status(400).json({ msg: 'Invalid body parameters' });
+
+    const product = await productsAPI.getProducts(productId);
+
+    if (!product.length)
+      return res.status(400).json({ msg: 'product not found' });
+
+    if (parseInt(productAmount) < 0)
+      return res.status(400).json({ msg: 'Invalid amount' });
+
+    const updatedCart = await productsCarAPI.addProduct(
+      cart._id,
+      productId,
+      parseInt(productAmount)
+    );
+    res.json({ msg: 'Product added', cart: updatedCart });
+  }
+
+  async deleteProduct(req: Request, res: Response) {
+    const user: any = req.user;
+    const car = await productsCarAPI.getProducts(user._id);
+
+    const { productId, productAmount } = req.body;
+
+    if (!productId || !productAmount)
+      return res.status(400).json({ msg: 'Invalid body parameters' });
+
+    const product = await productsAPI.getProducts(productId);
+
+    if (!product.length)
+      return res.status(400).json({ msg: 'product not found' });
+
+    if (parseInt(productAmount) < 0)
+      return res.status(400).json({ msg: 'Invalid amount' });
+
+    const updatedCar = await productsCarAPI.deleteProudct(
+      car._id,
+      productId,
+      parseInt(productAmount)
+    );
+    res.json({ msg: 'Product deleted', cart: updatedCar });
   }
 }
 

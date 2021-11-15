@@ -14,7 +14,7 @@ export interface newProductCarI {
 export interface ProductCarI {
   _id: string;
   userId: productReference;
-  products: ProductCar[];
+  productsCar: ProductCar[];
 }
 
 export interface ProductCar {
@@ -22,18 +22,6 @@ export interface ProductCar {
   amount: number;
 }
 
-
-export interface ProductCarQuery {
-  name?: string;
-  price?: number;
-  description?: string;
-  codeproduct?: number;
-  url?: string;
-  stock?: number;
-
-  
-
-}
 
 export interface ProductCarBaseClass {
   get(id: string): Promise<ProductCarI>;
