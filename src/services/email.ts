@@ -1,5 +1,6 @@
 import Config from '../config';
 import nodemailer from 'nodemailer';
+import path from 'path';
 
 class Email {
   private owner;
@@ -7,18 +8,19 @@ class Email {
 
   constructor() {
     this.owner = {
-      name: Config.ETHEREAL_NAME,
-      address: Config.ETHEREAL_EMAIL,
+      name: Config.GMAIL_NAME,
+      address: Config.GMAIL_EMAIL,
     };
 
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
+      host: 'smtp.gmail.com',
+      port: 465,
       auth: {
-        user: Config.ETHEREAL_EMAIL,
-        pass: Config.ETHEREAL_PASSWORD,
+        user: Config.GMAIL_EMAIL,
+        pass: Config.GMAIL_PASSWORD,
       },
     });
+    this.transporter.verify().then(() => console.log('READY To Send Email'));
   }
 
   async sendEmail(dest: string, subject: string, content: string) {
@@ -27,6 +29,12 @@ class Email {
       to: dest,
       subject,
       html: content,
+      attachments: [
+        {
+          // filename and content type is derived from path
+          path: path.resolve(__dirname, '../nodemailer.png'),
+        },
+      ],
     };
 
     const response = await this.transporter.sendMail(mailOptions);
