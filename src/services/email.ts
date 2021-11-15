@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import path from 'path';
 
 class Email {
-  private owner;
+  private owner:any;
   private transporter;
 
   constructor() {
@@ -15,6 +15,7 @@ class Email {
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
+      secure: true,
       auth: {
         user: Config.GMAIL_EMAIL,
         pass: Config.GMAIL_PASSWORD,
